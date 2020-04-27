@@ -28,31 +28,31 @@
 ;;;; FIXME/TODO:
 
 ;; - Allow packages more control over what is auto-predefined.
+;; - Don't just silently drop those packages with more than 10 autoloads.
 ;; - Allow more than `auto-mode-alist' and `autoload's, e.g. allow
 ;;   new menu entries.
 ;; - Merge with `gnu-elpa-keyring-update'?
 
 ;;; Code:
 
-;;;###autoload (unless (assoc "gnu" package-archives)
-;;;###autoload   (push '("gnu" . "https://elpa.gnu.org/packages/")
-;;;###autoload         package-archives))
+;; ¡¡ BEWARE !!  Don't try to load this file via `load' or `require'!
+;; It's only used as a kind of trigger to find the function that is being
+;; autoloaded.
+
+;; This is done because:
+;; - We want `gnu-elpa' to use `autoload', so that a subsequent call to
+;;   `autoload' performed by the actual real package (if/hen it's installed)
+;;   will override our pseudo-autoload.
+;; - We don't want to use a separate file for every advertized package,
+;;   so we pretend all the functions get "autoloaded" from `gnu-elpa.el'.
 
 ;; This file is not meant to be `require'd but to be loaded in response
 ;; to calling a function (i.e. via autoload) and it will find the package
 ;; that provides this function and suggest installing the package.
 ;;(provide 'gnu-elpa)
 
-(let* ((bt (backtrace-frames))
-       (bt-stash bt)
-       (trigger-function nil))
-  (while bt
-    (pcase-let ((`(\_ ,f . ,_) (pop bt)))
-      (when (and (symbolp f) (autoloadp (indirect-function f)))
-        (setq trigger-function f)
-        (setq bt nil))))
-  (unless trigger-function
-    (error "Can't find the autoload call!"))
-  (message "Autoloading %S" trigger-function))
+(require 'gnu-elpa-utils)
+
+(gnu-elpa--perform-autoload)
 
 ;;; gnu-elpa.el ends here
