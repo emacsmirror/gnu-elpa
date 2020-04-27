@@ -1,6 +1,6 @@
 ;;; gnu-elpa-maint.el --- Maintenance functions for gnu-elpa.el  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  Stefan Monnier
+;; Copyright (C) 2020  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords:
