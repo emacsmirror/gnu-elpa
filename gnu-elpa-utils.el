@@ -50,10 +50,10 @@
 
 (defun gnu-elpa--package (func)
   "Return the package that provides function FUNC."
-  (let ((pkg nil))
-    (dolist (pkg-desc gnu-elpa--autoloads-table)
-      (mapc (lambda (f) (if (eq f func) (setq pkg (aref pkg-desc 0)))) pkg-desc))
-    pkg))
+  (let ((thepkg nil))
+    (pcase-dolist (`(,prefix . ,pkg) gnu-elpa--autoloads-table)
+      (if (string-prefix-p prefix (symbol-name func)) (setq thepkg pkg)))
+    thepkg))
 
 (defun gnu-elpa--perform-autoload ()
   "Prompt to install the package that provides the currently autoloaded function.

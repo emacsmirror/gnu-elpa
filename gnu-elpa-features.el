@@ -928,10 +928,10 @@ CSV mode provides the following specific keyboard key bindings:
 (fn)" t nil)
              (darkroom-tentative-mode "Enters `darkroom-mode' when all other windows are deleted.
 
-If called interactively, enable DarkRoom-Tentative mode if ARG is positive, and
-disable it if ARG is zero or negative.  If called from Lisp,
-also enable the mode if ARG is omitted or nil, and toggle it
-if ARG is `toggle'; disable the mode otherwise.
+If called interactively, enable DarkRoom-Tentative mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
 
 (fn &optional ARG)" t nil)
              (darkroom-mode "Remove visual distractions and focus on writing. When this
@@ -940,10 +940,10 @@ view. The buffer margins are set so that text is centered on
 screen. Text size is increased (display engine allowing) by
 `darkroom-text-scale-increase'.
 
-If called interactively, enable Darkroom mode if ARG is positive, and
-disable it if ARG is zero or negative.  If called from Lisp,
-also enable the mode if ARG is omitted or nil, and toggle it
-if ARG is `toggle'; disable the mode otherwise.
+If called interactively, enable Darkroom mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
 
 (fn &optional ARG)" t nil)
              (dbus-codegen-make-proxy "Create a new D-Bus proxy based on the introspection data.
@@ -1964,6 +1964,18 @@ Use \\[describe-mode] for more info.
              (landmark-test-run "Run 100 Landmark games, each time saving the weights from the previous game.
 
 (fn)" t nil)
+             (leaf "Symplify your `.emacs' configuration for package NAME with ARGS.
+
+(fn NAME &rest ARGS)" nil t)
+             (leaf-expand "Expand `leaf' at point." t nil)
+             (leaf-create-issue-template "Create issue template buffer." t nil)
+             (leaf-pp "Output the pretty-printed representation of leaf SEXP.
+
+(fn SEXP)" nil nil)
+             (leaf-pp-to-string "Return format string of `leaf' SEXP like `pp-to-string'.
+
+(fn SEXP)" nil t)
+             (leaf-available-keywords "Return current available `leaf' keywords list." t nil)
              (lex-parse-re "Parse STRING as a regular expression.
 LEXER specifies the regexp syntax to use.  It can be `ere', or `bre'
 and it defaults to `bre'.
@@ -2122,10 +2134,10 @@ Called with a prefix prompt for the difficulty level.
 (fn &optional ARG)" t nil)
              (minimap-mode "Toggle minimap mode.
 
-If called interactively, enable Minimap mode if ARG is positive, and
-disable it if ARG is zero or negative.  If called from Lisp,
-also enable the mode if ARG is omitted or nil, and toggle it
-if ARG is `toggle'; disable the mode otherwise.
+If called interactively, enable Minimap mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
 
 (fn &optional ARG)" t nil)
              (mmm-add-classes "Add the submode classes CLASSES to `mmm-classes-alist'.
@@ -3498,6 +3510,95 @@ At the moment, only `tiny-mapconcat' is supported.
              (transcribe-mode "Toggle transcribe-mode
 
 (fn &optional ARG)" t nil)
+             (define-infix-command "Define NAME as a transient infix command.
+
+ARGLIST is always ignored and reserved for future use.
+DOCSTRING is the documentation string and is optional.
+
+The key-value pairs are mandatory.  All transient infix commands
+are equal to each other (but not eq), so it is meaningless to
+define an infix command without also setting at least `:class'
+and one other keyword (which it is depends on the used class,
+usually `:argument' or `:variable').
+
+Each key has to be a keyword symbol, either `:class' or a keyword
+argument supported by the constructor of that class.  The
+`transient-switch' class is used if the class is not specified
+explicitly.
+
+The function definitions is always:
+
+   (lambda ()
+     (interactive)
+     (let ((obj (transient-suffix-object)))
+       (transient-infix-set obj (transient-infix-read obj)))
+     (transient--show))
+
+`transient-infix-read' and `transient-infix-set' are generic
+functions.  Different infix commands behave differently because
+the concrete methods are different for different infix command
+classes.  In rare case the above command function might not be
+suitable, even if you define your own infix command class.  In
+that case you have to use `transient-suffix-command' to define
+the infix command and use t as the value of the `:transient'
+keyword.
+
+(fn NAME ARGLIST [DOCSTRING] [KEYWORD VALUE]...)" nil t)
+             (define-suffix-command "Define NAME as a transient suffix command.
+
+ARGLIST are the arguments that the command takes.
+DOCSTRING is the documentation string and is optional.
+
+These arguments can optionally be followed by key-value pairs.
+Each key has to be a keyword symbol, either `:class' or a
+keyword argument supported by the constructor of that class.
+The `transient-suffix' class is used if the class is not
+specified explicitly.
+
+The BODY must begin with an `interactive' form that matches
+ARGLIST.  The infix arguments are usually accessed by using
+`transient-args' inside `interactive'.
+
+(fn NAME ARGLIST [DOCSTRING] [KEYWORD VALUE]... BODY...)" nil t)
+             (define-transient-command "Define NAME as a transient prefix command.
+
+ARGLIST are the arguments that command takes.
+DOCSTRING is the documentation string and is optional.
+
+These arguments can optionally be followed by key-value pairs.
+Each key has to be a keyword symbol, either `:class' or a keyword
+argument supported by the constructor of that class.  The
+`transient-prefix' class is used if the class is not specified
+explicitly.
+
+GROUPs add key bindings for infix and suffix commands and specify
+how these bindings are presented in the popup buffer.  At least
+one GROUP has to be specified.  See info node `(transient)Binding
+Suffix and Infix Commands'.
+
+The BODY is optional.  If it is omitted, then ARGLIST is also
+ignored and the function definition becomes:
+
+  (lambda ()
+    (interactive)
+    (transient-setup \\='NAME))
+
+If BODY is specified, then it must begin with an `interactive'
+form that matches ARGLIST, and it must call `transient-setup'.
+It may however call that function only when some condition is
+satisfied; that is one of the reason why you might want to use
+an explicit BODY.
+
+All transients have a (possibly nil) value, which is exported
+when suffix commands are called, so that they can consume that
+value.  For some transients it might be necessary to have a sort
+of secondary value, called a scope.  Such a scope would usually
+be set in the commands `interactive' form and has to be passed
+to the setup function:
+
+  (transient-setup \\='NAME nil nil :scope SCOPE)
+
+(fn NAME ARGLIST [DOCSTRING] [KEYWORD VALUE]... GROUP... [BODY...])" nil t)
              (global-undo-tree-mode "Toggle Undo-Tree mode in all buffers.
 With prefix ARG, enable Global Undo-Tree mode if ARG is positive;
 otherwise, disable it.  If called from Lisp, enable the mode if
@@ -3985,10 +4086,12 @@ in SKIP-SET-STRING.
              (xr-lint "Detect dubious practices and possible mistakes in RE-STRING.
 This includes uses of tolerated but discouraged constructs.
 Outright regexp syntax violations are signalled as errors.
+If PURPOSE is `file', perform additional checks assuming that RE-STRING
+is used to match a file name.
 Return a list of (OFFSET . COMMENT) where COMMENT applies at OFFSET
 in RE-STRING.
 
-(fn RE-STRING)" nil nil)
+(fn RE-STRING &optional PURPOSE)" nil nil)
              (xr-skip-set "Convert a skip set string argument to rx notation.
 SKIP-SET-STRING is interpreted according to the syntax of
 `skip-chars-forward' and `skip-chars-backward' and converted to
@@ -4097,7 +4200,7 @@ Argument DIR2 right directory.
 (add-to-list 'auto-mode-alist '("\\.[Vv][Cc][Ff]\\'" . vcard-mode))
 (add-to-list 'auto-mode-alist (cons (purecopy "\\.vcl\\'") 'vcl-mode))
 (add-to-list 'auto-mode-alist '("\\.wy\\'" . wisitoken-grammar-mode))
-(defconst gnu-elpa--autoloads-table '(["ace-window" ace-window-display-mode ace-window ace-maximize-window ace-swap-window ace-delete-window ace-select-window] ["ack" pcomplete/ag pcomplete/ack ack] ["adaptive-wrap" adaptive-wrap-prefix-mode] ["adjust-parens" adjust-parens-mode] ["advice-patch" advice-patch] ["aggressive-indent" global-aggressive-indent-mode aggressive-indent-mode aggressive-indent-indent-region-and-on aggressive-indent-indent-defun] ["all" all] ["ampc" ampc ampc-on-p ampc-suspended-p ampc-tag-files ampc-tagger-dired ampc-tagger-dired-mode] ["arbitools" arbitools-mode] ["ascii-art-to-unicode" aa2u-mark-rectangle-as-text aa2u-mark-as-text aa2u-rectangle aa2u] ["async" dired-async-do-rename dired-async-do-hardlink dired-async-do-symlink dired-async-do-copy dired-async-mode async-byte-compile-file async-bytecomp-package-mode async-byte-recompile-directory async-start async-start-process] ["aumix-mode" aumix aumix-mode] ["auto-correct" auto-correct-scan auto-correct-scan-region auto-correct-scan-buffer auto-correct-fix-and-add auto-correct-mode] ["auto-overlays" auto-overlay-load-overlays auto-overlay-share-regexp-set auto-overlay-load-regexp auto-overlay-load-definition auto-overlay-local-binding auto-overlay-highest-priority-at-point auto-overlays-in auto-overlays-at-point] ["beacon" beacon-mode beacon-blink] ["bluetooth" bluetooth-list-devices] ["bnf-mode" bnf-mode] ["brief" brief-easy-start brief-mode] ["buffer-expose" buffer-expose-project-no-stars buffer-expose-project-stars buffer-expose-project buffer-expose-dired-buffers buffer-expose-no-stars buffer-expose-stars buffer-expose-major-mode buffer-expose-current-mode buffer-expose buffer-expose-mode] ["bug-hunter" bug-hunter-init-file bug-hunter-file] ["caps-lock" caps-lock-mode] ["captain" global-captain-mode captain-mode] ["chess" chess-tutorial chess-fischer-random-position chess-puzzle chess-pgn-mode chess-pgn-read chess-link chess-ics chess-create-display chess] ["clipboard-collector" clipboard-collector-create clipboard-collector-mode] ["cobol-mode" cobol-mode] ["coffee-mode" coffee-mode] ["compact-docstrings" global-compact-docstrings-mode compact-docstrings-mode] ["company-ebdb" company-ebdb] ["company-math" company-math-symbols-unicode company-math-symbols-latex company-latex-commands] ["company-statistics" company-statistics-mode] ["context-coloring" context-coloring-js2-colorize context-coloring-eval-expression-predicate context-coloring-eval-expression-colorize context-coloring-elisp-colorize context-coloring-mode] ["crisp" crisp-mode] ["csv-mode" tsv-mode csv-mode] ["cycle-quotes" cycle-quotes] ["darkroom" darkroom-tentative-mode darkroom-mode] ["dbus-codegen" dbus-codegen-make-proxy dbus-codegen-define-proxy] ["delight" delight] ["dict-tree" read-dict dictree-load dictree-p make-dictree-meta-dict make-dictree-custom make-dictree] ["diff-hl" diff-hl-margin-mode diff-hl-flydiff-mode diff-hl-dired-mode-unless-remote diff-hl-dired-mode global-diff-hl-amend-mode diff-hl-amend-mode global-diff-hl-mode turn-on-diff-hl-mode diff-hl-mode] ["diffview" diffview-message diffview-region diffview-current] ["dired-du" dired-du-insert-marked-dirs dired-du-count-sizes dired-du-mode] ["dired-git-info" dired-git-info-auto-enable dired-git-info-mode] ["disk-usage" disk-usage-by-types-here disk-usage-by-types disk-usage-here disk-usage] ["dismal" log-session-mode dismal-mode] ["djvu" djvu-bookmark-handler djvu-inspect-file djvu-find-file djvu-dummy-mode] ["docbook" docbook-find-file] ["dts-mode" dts-mode] ["easy-kill" easy-mark easy-kill] ["ediprolog" ediprolog-localize ediprolog-consult ediprolog-remove-interactions ediprolog-interact ediprolog-dwim] ["eev" eev-beginner] ["eglot" eglot-ensure eglot] ["eldoc-eval" eldoc-eval-expression eldoc-in-minibuffer-mode] ["electric-spacing" electric-spacing-mode] ["elisp-benchmarks" elisp-benchmarks-run] ["enwc" enwc-register-backend enwc] ["epoch-view" epoch-view-mode] ["excorporate" exco-org-show-day excorporate-diary-enable exco-calfw-show-day excorporate] ["expand-region" er/expand-region] ["filladapt" filladapt-mode] ["fountain-mode" fountain-mode] ["frame-tabs" frame-tabs-mode] ["frog-menu" frog-menu-read frog-menu-call] ["ggtags" ggtags-try-complete-tag ggtags-build-imenu-index ggtags-mode ggtags-find-tag-dwim ggtags-find-project] ["gited" gited-list-branches] ["gle-mode" gle-mode] ["gnome-c-style" gnome-c-style-mode gnome-c-snippet-insert gnome-c-snippet-insert-PackageClass gnome-c-snippet-insert-PACKAGE_CLASS gnome-c-snippet-insert-package_class gnome-c-align-decls-region gnome-c-align-guess-columns gnome-c-align-guess-optimal-columns gnome-c-align-set-column gnome-c-align-arglist-at-point] ["gnu-elpa-keyring-update" gnu-elpa-keyring-update] ["gnugo" gnugo-imgen-create-xpms gnugo-frolic-in-the-leaves gnugo] ["gnus-mock" gnus-mock-start] ["gpastel" gpastel-mode] ["greader" greader-speechd greader-espeak] ["guess-language" guess-language-mode] ["heap" make-heap] ["highlight-escape-sequences" hes-mode turn-off-hes-mode turn-on-hes-mode] ["hook-helpers" define-hook-function define-hook-helper create-hook-helper] ["hydra" defhydra] ["ivy-explorer" ivy-explorer-mode] ["javaimp" javaimp-organize-imports javaimp-add-import javaimp-visit-project] ["jgraph-mode" jgraph-mode] ["js2-mode" js2-jsx-mode js2-mode js2-minor-mode js2-highlight-unused-variables-mode js2-imenu-extras-mode js2-imenu-extras-setup] ["json-mode" json-mode] ["jumpc" jumpc] ["landmark" landmark landmark-test-run] ["lex" lex-parse-re lex-compile] ["lmc" lmc-asm-mode] ["load-dir" load-dirs-reload load-dirs] ["load-relative" provide-me require-relative-list require-relative load-relative with-relative-file find-file-noselect-relative __FILE__] ["loccur" loccur loccur-current] ["markchars" markchars-global-mode markchars-mode] ["memory-usage" memory-usage] ["metar" metar] ["midi-kbd" midikbd-open] ["mines" mines] ["minibuffer-line" minibuffer-line-mode] ["minimap" minimap-mode] ["mmm-mode" mmm-add-classes nxml-web-mode html-erb-mode] ["multishell" multishell-list multishell-pop-to-shell] ["nameless" nameless-mode] ["names" define-namespace] ["nhexl-mode" nhexl-mode] ["nlinum" global-nlinum-mode nlinum-mode] ["notes-mode" notes-w3-follow-link-mouse notes-w3-follow-link notes-w3-url notes-mode notes-underline-line notes-index-mode notes-index-todays-link notes-format-date] ["num3-mode" global-num3-mode num3-mode] ["oauth2" oauth2-url-retrieve oauth2-url-retrieve-synchronously oauth2-auth-and-store oauth2-auth oauth2-refresh-access] ["olivetti" olivetti-mode] ["omn-mode" omn-mode] ["on-screen" on-screen-global-mode on-screen-mode] ["org-edna" org-edna-mode org-edna--unload org-edna--load] ["orgalist" orgalist-mode] ["osc" osc-make-server osc-send-message osc-make-client] ["other-frame-window" other-frame-window-mode] ["pabbrev" global-pabbrev-mode pabbrev-mode] ["paced" paced-repopulate-current-dictionary-async paced-repopulate-named-dictionary-async paced-load-all-dictionaries] ["phps-mode" phps-mode-format-buffer phps-mode-flycheck-setup phps-mode-rescan-buffer] ["pinentry" pinentry-start] ["poker" poker] ["posframe" posframe-delete-all posframe-hide-all posframe-show posframe-workable-p] ["psgml" style-format xml-mode sgml-mode] ["quarter-plane" global-quarter-plane-mode quarter-plane-mode] ["rainbow-mode" rainbow-mode] ["rcirc-menu" rcirc-menu] ["register-list" register-list] ["relint" relint-buffer relint-current-buffer relint-directory relint-file] ["rich-minority" rich-minority-mode rm--mode-list-as-string-list] ["rnc-mode" rnc-mode] ["scanner" scanner-scan-multi-images scanner-scan-image scanner-scan-multi-doc scanner-scan-document scanner-select-device scanner-set-document-resolution scanner-set-image-resolution scanner-select-outputs scanner-select-languages scanner-select-papersize] ["scroll-restore" scroll-restore-mode] ["sed-mode" sed-mode] ["shelisp" shelisp-mode] ["shen-mode" shen-mode inferior-shen] ["sisu-mode" sisu-mode] ["sm-c-mode" sm-c-mode] ["smalltalk-mode" smalltalk-mode gst] ["smart-yank" smart-yank-mode] ["sml-mode" sml-yacc-mode sml-lex-mode sml-cm-mode sml-mode sml-run] ["sokoban" sokoban] ["sotlisp" speed-of-thought-hook-in speed-of-thought-mode] ["spinner" spinner-start spinner-create] ["sql-indent" sqlind-setup-style-default sqlind-setup-style-right sqlind-setup-style-left sqlind-setup sqlind-minor-mode] ["svg-clock" svg-clock svg-clock-insert] ["tNFA" tNFA-regexp-match tNFA-from-regexp] ["temp-buffer-browse" temp-buffer-browse-mode temp-buffer-browse-activate] ["test-simple" test-simple-run test-simple-clear test-simple-start] ["timerfunctions" tf-with-timeout tf-run-with-idle-timer tf-time-difference timerfunctions-introduction] ["tiny" tiny-helper tiny-expand] ["transcribe" transcribe-mode] ["undo-tree" global-undo-tree-mode undo-tree-mode] ["uniquify-files" uniq-file-read] ["url-http-ntlm" url-ntlm-auth] ["validate" validate-mark-safe-local validate-variable validate-value] ["vcard" vcard-parse-buffer vcard-parse-file vcard-mode] ["vcl-mode" vcl-mode] ["vdiff" vdiff-current-file vdiff-files3 vdiff-merge-conflict vdiff-buffers3 vdiff-buffers vdiff-files] ["vigenere" vigenere-encrypt-buffer vigenere-decrypt-buffer vigenere-encrypt-region vigenere-decrypt-region] ["visual-fill" visual-fill-mode] ["vlf" vlf-occur-load vlf-ediff-files vlf] ["wcheck-mode" wcheck-actions wcheck-jump-backward wcheck-jump-forward wcheck-mode wcheck-change-language] ["wconf" wconf-create wconf-load] ["web-server" ws-start] ["webfeeder" webfeeder-build webfeeder-make-atom webfeeder-make-rss webfeeder-html-files-to-items] ["windresize" windresize] ["wisitoken-grammar-mode" wisitoken-grammar-mode] ["wpuzzle" 100secwp] ["xclip" xclip-mode] ["xpm" xpm-m2z-circle xpm-m2z-ellipse xpm-generate-buffer xpm-grok] ["xr" xr-skip-set-pp xr-pp xr-skip-set-lint xr-lint xr-skip-set xr] ["yasnippet" snippet-mode yas-global-mode yas-minor-mode] ["ztree" ztree-mode ztree-dir ztree-diff ztreediff-mode]))
+(defconst gnu-elpa--autoloads-table '(("ace-" . "ace-window") ("ack" . "ack") ("adaptive-wrap-prefix-mode" . "adaptive-wrap") ("adjust-parens-mode" . "adjust-parens") ("advice-patch" . "advice-patch") ("aggressive-indent-" . "aggressive-indent") ("all" . "all") ("ampc" . "ampc") ("arbitools-mode" . "arbitools") ("aa2u" . "ascii-art-to-unicode") ("async-" . "async") ("aumix" . "aumix-mode") ("auto-correct-" . "auto-correct") ("auto-overlay" . "auto-overlays") ("pcomplete/a" . "ack") ("provide-me" . "load-relative") ("pabbrev-mode" . "pabbrev") ("paced-" . "paced") ("phps-mode-" . "phps-mode") ("pinentry-start" . "pinentry") ("poker" . "poker") ("posframe-" . "posframe") ("global-aggressive-indent-mode" . "aggressive-indent") ("global-captain-mode" . "captain") ("global-compact-docstrings-mode" . "compact-docstrings") ("global-diff-hl-" . "diff-hl") ("global-nlinum-mode" . "nlinum") ("global-num3-mode" . "num3-mode") ("global-pabbrev-mode" . "pabbrev") ("global-quarter-plane-mode" . "quarter-plane") ("global-undo-tree-mode" . "undo-tree") ("gle-mode" . "gle-mode") ("ggtags-" . "ggtags") ("gited-list-branches" . "gited") ("gnome-c-" . "gnome-c-style") ("gnu-elpa-keyring-update" . "gnu-elpa-keyring-update") ("gnugo" . "gnugo") ("gnus-mock-start" . "gnus-mock") ("gpastel-mode" . "gpastel") ("greader-" . "greader") ("guess-language-mode" . "guess-language") ("gst" . "smalltalk-mode") ("dired-async-" . "async") ("dired-du-" . "dired-du") ("dired-git-info-" . "dired-git-info") ("dictree-" . "dict-tree") ("diff-hl-" . "diff-hl") ("diffview-" . "diffview") ("disk-usage" . "disk-usage") ("dismal-mode" . "dismal") ("darkroom-" . "darkroom") ("dbus-codegen-" . "dbus-codegen") ("delight" . "delight") ("define-hook-" . "hook-helpers") ("define-namespace" . "names") ("define-infix-command" . "transient") ("define-suffix-command" . "transient") ("define-transient-command" . "transient") ("defhydra" . "hydra") ("djvu-" . "djvu") ("docbook-find-file" . "docbook") ("dts-mode" . "dts-mode") ("beacon-" . "beacon") ("bluetooth-list-devices" . "bluetooth") ("bnf-mode" . "bnf-mode") ("brief-" . "brief") ("buffer-expose" . "buffer-expose") ("bug-hunter-" . "bug-hunter") ("caps-lock-mode" . "caps-lock") ("captain-mode" . "captain") ("chess" . "chess") ("clipboard-collector-" . "clipboard-collector") ("cobol-mode" . "cobol-mode") ("coffee-mode" . "coffee-mode") ("compact-docstrings-mode" . "compact-docstrings") ("company-ebdb" . "company-ebdb") ("company-math-symbols-" . "company-math") ("company-latex-commands" . "company-math") ("company-statistics-mode" . "company-statistics") ("context-coloring-" . "context-coloring") ("crisp-mode" . "crisp") ("create-hook-helper" . "hook-helpers") ("csv-mode" . "csv-mode") ("cycle-quotes" . "cycle-quotes") ("tsv-mode" . "csv-mode") ("turn-on-diff-hl-mode" . "diff-hl") ("turn-on-hes-mode" . "highlight-escape-sequences") ("turn-off-hes-mode" . "highlight-escape-sequences") ("tNFA-" . "tNFA") ("temp-buffer-browse-" . "temp-buffer-browse") ("test-simple-" . "test-simple") ("tf-" . "timerfunctions") ("timerfunctions-introduction" . "timerfunctions") ("tiny-" . "tiny") ("transcribe-mode" . "transcribe") ("read-dict" . "dict-tree") ("require-relative" . "load-relative") ("register-list" . "register-list") ("relint-" . "relint") ("rainbow-mode" . "rainbow-mode") ("rcirc-menu" . "rcirc-menu") ("rich-minority-mode" . "rich-minority") ("rm--mode-list-as-string-list" . "rich-minority") ("rnc-mode" . "rnc-mode") ("make-dictree" . "dict-tree") ("make-heap" . "heap") ("markchars-" . "markchars") ("memory-usage" . "memory-usage") ("metar" . "metar") ("midikbd-open" . "midi-kbd") ("mines" . "mines") ("minibuffer-line-mode" . "minibuffer-line") ("minimap-mode" . "minimap") ("mmm-add-classes" . "mmm-mode") ("multishell-" . "multishell") ("log-session-mode" . "dismal") ("load-dirs" . "load-dir") ("load-relative" . "load-relative") ("loccur" . "loccur") ("landmark" . "landmark") ("leaf" . "leaf") ("lex-" . "lex") ("lmc-asm-mode" . "lmc") ("easy-" . "easy-kill") ("ediprolog-" . "ediprolog") ("eev-beginner" . "eev") ("eglot" . "eglot") ("eldoc-" . "eldoc-eval") ("electric-spacing-mode" . "electric-spacing") ("elisp-benchmarks-run" . "elisp-benchmarks") ("enwc" . "enwc") ("epoch-view-mode" . "epoch-view") ("exco" . "excorporate") ("er/expand-region" . "expand-region") ("filladapt-mode" . "filladapt") ("find-file-noselect-relative" . "load-relative") ("fountain-mode" . "fountain-mode") ("frame-tabs-mode" . "frame-tabs") ("frog-menu-" . "frog-menu") ("hes-mode" . "highlight-escape-sequences") ("html-erb-mode" . "mmm-mode") ("ivy-explorer-mode" . "ivy-explorer") ("inferior-shen" . "shen-mode") ("javaimp-" . "javaimp") ("jgraph-mode" . "jgraph-mode") ("js2-" . "js2-mode") ("json-mode" . "json-mode") ("jumpc" . "jumpc") ("with-relative-file" . "load-relative") ("windresize" . "windresize") ("wisitoken-grammar-mode" . "wisitoken-grammar-mode") ("wcheck-" . "wcheck-mode") ("wconf-" . "wconf") ("ws-start" . "web-server") ("webfeeder-" . "webfeeder") ("__FILE__" . "load-relative") ("nxml-web-mode" . "mmm-mode") ("nameless-mode" . "nameless") ("nhexl-mode" . "nhexl-mode") ("nlinum-mode" . "nlinum") ("notes-" . "notes-mode") ("num3-mode" . "num3-mode") ("oauth2-" . "oauth2") ("olivetti-mode" . "olivetti") ("omn-mode" . "omn-mode") ("on-screen-" . "on-screen") ("org-edna-" . "org-edna") ("orgalist-mode" . "orgalist") ("osc-" . "osc") ("other-frame-window-mode" . "other-frame-window") ("style-format" . "psgml") ("sgml-mode" . "psgml") ("scanner-s" . "scanner") ("scroll-restore-mode" . "scroll-restore") ("sed-mode" . "sed-mode") ("shelisp-mode" . "shelisp") ("shen-mode" . "shen-mode") ("sisu-mode" . "sisu-mode") ("sm-c-mode" . "sm-c-mode") ("smalltalk-mode" . "smalltalk-mode") ("smart-yank-mode" . "smart-yank") ("sml-" . "sml-mode") ("sokoban" . "sokoban") ("speed-of-thought-" . "sotlisp") ("spinner-" . "spinner") ("sqlind-" . "sql-indent") ("svg-clock" . "svg-clock") ("snippet-mode" . "yasnippet") ("xml-mode" . "psgml") ("xclip-mode" . "xclip") ("xpm-" . "xpm") ("xr" . "xr") ("quarter-plane-mode" . "quarter-plane") ("undo-tree-mode" . "undo-tree") ("uniq-file-read" . "uniquify-files") ("url-ntlm-auth" . "url-http-ntlm") ("validate-" . "validate") ("vcard-" . "vcard") ("vcl-mode" . "vcl-mode") ("vdiff-" . "vdiff") ("vigenere-" . "vigenere") ("visual-fill-mode" . "visual-fill") ("vlf" . "vlf") ("100secwp" . "wpuzzle") ("yas-" . "yasnippet") ("ztree" . "ztree")))
 
 ;; Local Variables:
 ;; no-byte-compile: t
