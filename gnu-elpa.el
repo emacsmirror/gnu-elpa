@@ -1,9 +1,10 @@
 ;;; gnu-elpa.el --- Advertize GNU ELPA packages  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  Free Software Foundation, Inc.
+;; Copyright (C) 2020-2021  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords:
+;; Package-Requires: ((emacs "25.1"))
 ;; Version: 1.1
 
 ;; This program is free software; you can redistribute it and/or modify

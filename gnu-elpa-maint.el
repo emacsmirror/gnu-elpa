@@ -1,6 +1,6 @@
 ;;; gnu-elpa-maint.el --- Maintenance functions for gnu-elpa.el  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  Free Software Foundation, Inc.
+;; Copyright (C) 2020-2021  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords:
@@ -21,17 +21,21 @@
 
 ;;; Commentary:
 
-;; Extract the relevant features to advertise
+;; Extract the relevant features to advertise.
 
 ;; This is expected to be run from within
 ;; .../elpa/packages/gnu-elpa/
 ;; where `.../elpa` is a clone of `elpa.git` in which
-;; both `make externals` and `make` were performed (actually, only
-;; the autoloads need to be generated).
+;; both `make worktrees` and `make autoloads` were performed.
+
+;; Use it as follows:
+;;
+;;     emacs --batch -l gnu-elpa-maint -f gnu-elpa--make-features
 
 ;;; Code:
 
 (require 'map)
+(require 'lisp-mnt)
 (require 'radix-tree)
 
 ;; FIXME: Skip those packages that aren't released, e.g. w3 and sm-c-mode
@@ -46,10 +50,21 @@
         (push d pkgs)))
     (nreverse pkgs)))
 
+(defun gnu-elpa--main-file (pkg)
+  (let ((pkg-re (regexp-quote pkg)))
+    (with-current-buffer (find-file-noselect "../../.pkg-descs.mk")
+      (goto-char (point-min))
+      (if (re-search-forward
+           (format "^packages/%s/%s-pkg.el: *packages/\\(.*\\)"
+                   pkg-re pkg-re)
+           nil t)
+          (match-string 1)
+        (concat pkg "/" pkg ".el")))))
+
 (defun gnu-elpa--features-for-pkg (pkg)
   (with-temp-buffer
     (emacs-lisp-mode)
-    (when (let ((f (format "../%s/%s.el" pkg pkg)))
+    (when (let ((f (format "../%s" (gnu-elpa--main-file pkg))))
             (insert-file-contents f nil 0 16384) ;Arbitrary limit, just in case.
             (prog1
                 (and (member (lm-header "auto-suggest") '(nil "yes" "t"))
@@ -91,7 +106,8 @@
             (`(eieio-defclass-autoload  . ,_) nil)
             (`(cl-defstruct . ,_) nil)
             (`(,(or 'put 'function-put) ,_
-               ',(or 'interactive-only 'lisp-indent-function 'doc-string-elt)
+               ',(or 'interactive-only 'lisp-indent-function 'doc-string-elt
+                     'safe-local-variable)
                . ,_)
              nil)
             ;;
@@ -226,7 +242,6 @@
       (insert "
 
 \;;\sLocal\sVariables:
-\;;\sno-byte-compile: t
 \;;\sversion-control: never
 \;;\sno-update-autoloads: t
 \;; End:
