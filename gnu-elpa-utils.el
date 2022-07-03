@@ -1,6 +1,6 @@
 ;;; gnu-elpa-utils.el --- Helper functions for `gnu-elpa'  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020-2021  Free Software Foundation, Inc.
+;; Copyright (C) 2020-2022  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords:
@@ -134,21 +134,25 @@ yet loaded."
   ;; explaining a bit more what's going on with a short description of
   ;; the package.
   ;; FIXME: We should ask "yes/notnow/never"!
-  (unless (yes-or-no-p (format "Function %S was called: Install package %s? "
-                               f pkg))
-    ;; FIXME: If "never" we should record this info somewhere
-    ;; and then avoid reinstalling the corresponding autoloads
-    ;; at the next start.
-    ;; FIXME: Remove the corresponding autoloads for the current session!
-    ;; FIXME: Rather than just "Abort" try and behave better in cases
-    ;; such as when sql.el calls `sqlind-minor-mode'.
-    (error "Abort!"))
-  ;; FIXME: These two initializations should be performed by
-  ;; `package-install'!
-  (unless (bound-and-true-p package--initialized) (package-initialize t))
-  (unless package-archive-contents (package-refresh-contents))
-  ;; FIXME: Is `package-install' really sufficient to load the proper function?
-  (package-install (intern pkg)))
+  (if (not (yes-or-no-p (format "Function %S was called: Install package %S? "
+                                f pkg)))
+      ;; FIXME: If "never" we should record this info somewhere
+      ;; and then avoid reinstalling the corresponding autoloads
+      ;; at the next start.
+      ;; FIXME: Remove the corresponding autoloads for the current session!
+      ;; FIXME: Rather than just "Abort" try and behave better in cases
+      ;; such as when sql.el calls `sqlind-minor-mode'.
+      (progn
+        (message "Abort installation of %S!" pkg)
+        (fset f nil))
+    ;; FIXME: These two initializations should be performed by
+    ;; `package-install'!
+    (unless (bound-and-true-p package--initialized) (package-initialize t))
+    (unless package-archive-contents (package-refresh-contents))
+    ;; FIXME: Is `package-install' really sufficient to load the
+    ;; proper function?
+    (package-install (intern pkg))))
+
 
 (provide 'gnu-elpa-utils)
 ;;; gnu-elpa-utils.el ends here
