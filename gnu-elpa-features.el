@@ -2047,7 +2047,7 @@ correctly.
 
 COMPARE-FUNCTION takes two arguments, A and B, and returns
 non-nil or nil. To implement a max-heap, it should return non-nil
-if A is greater than B. To implemenet a min-heap, it should
+if A is greater than B. To implement a min-heap, it should
 return non-nil if A is less than B.
 
 Optional argument INITIAL-SIZE sets the initial size of the heap,
@@ -2453,7 +2453,7 @@ and it defaults to `bre'.
 	     (lex-compile "Compile a set of regular expressions.
 ALIST is a list of elements of the form (REGEXP . VALUE).
 The compiled automaton will match all those regexps at the same time
-and will return the VALUE fof the leftmost longest match.
+and will return the VALUE for the leftmost longest match.
 
 Each REGEXP object should be in the sexp form described in the
 Commentary section.
@@ -2992,7 +2992,7 @@ starting with \"0o\" or \"#o\" – and instead they are handled
 like decimal numbers).
 
 Decimal fractions are recognised as well and grouped from the
-beginning rathar then the end.  For instance, with group size of
+beginning rather then the end.  For instance, with group size of
 three, a number \"12345.12345\" will be split into groups as
 follows: \"12|345.123|45\".  Fractions without integer part are
 also recognised, eg. \".12345\".
@@ -3112,7 +3112,7 @@ C-c C-c         `orgalist-check-item'
 DEFAULT-HANDLER is a function with arguments (path &rest args) which is called
 when a new OSC message arrives.  See `osc-server-set-handler' for more
 fine grained control.
-A process object is returned which can be dicarded with `delete-process'.
+A process object is returned which can be discarded with `delete-process'.
 
 (fn HOST PORT DEFAULT-HANDLER)" nil nil)
 	     (osc-send-message "Send an OSC message from CLIENT to the specified PATH with ARGS.
@@ -3609,7 +3609,7 @@ argument of COMMAND has a defined `eshell'-function, use that.
 Inside COMMAND, % is replaced with the current file name.  To
 insert a literal % quote it using a backslash.
 
-These extentions can all be combined with one-another.
+These extensions can all be combined with one-another.
 
 In case a region is active, `shell-command+' will only work with the region
 between BEG and END.  Otherwise the whole buffer is processed.
@@ -3770,7 +3770,7 @@ buffer, use that instead of current buffer.
 
 When started, in order to function properly, the spinner runs a
 timer which periodically calls `force-mode-line-update' in the
-curent buffer.  If BUFFER-LOCAL was set at creation time, then
+current buffer.  If BUFFER-LOCAL was set at creation time, then
 `force-mode-line-update' is called in that buffer instead.  When
 the spinner is stopped, the timer is deactivated.
 
@@ -3991,7 +3991,7 @@ See `tf-test-timeout' for another example.
 
 Important Note: If the body of a loop tends to stay in a timeout
 inhibited region for most of the time, then make sure that the timeout
-enabled region atleast spans about 0.02 seconds.. thus, use (sleep-for
+enabled region at least spans about 0.02 seconds.. thus, use (sleep-for
 0.02) if needed.. this is because we check every 0.01 seconds if an
 uninhibited timeout condition has been satisfied.
 

@@ -1,4 +1,4 @@
-;;; gnu-elpa.el --- Advertize GNU ELPA packages  -*- lexical-binding: t; -*-
+;;; gnu-elpa.el --- Advertise GNU ELPA packages  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020-2021  Free Software Foundation, Inc.
 
@@ -44,7 +44,7 @@
 ;; - We want `gnu-elpa' to use `autoload', so that a subsequent call to
 ;;   `autoload' performed by the actual real package (if/hen it's installed)
 ;;   will override our pseudo-autoload.
-;; - We don't want to use a separate file for every advertized package,
+;; - We don't want to use a separate file for every advertised package,
 ;;   so we pretend all the functions get "autoloaded" from `gnu-elpa.el'.
 
 ;; This file is not meant to be `require'd but to be loaded in response
